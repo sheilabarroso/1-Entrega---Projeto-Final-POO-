@@ -3,12 +3,12 @@
 
 ## Integrantes da Equipe:
 
-Sheila Matias Barroso (2025014897) - Modelagem da estrutura e Herança.
-Rubens Lopes dos Santos (2025014805) - Armazenamento de dados e settings.
-Carlos Rodrigo Ferreira da Silva (2025014304) - Gestão de Produto e Cliente.
-Viviana Barros Gomes de Sousa (2025014912) - Lógica central do carrinho, pedido e estoque.
-Vitoria Cavalcante Souza (2025019481) - Cálculos, Pagamento, Frete e Transições.
-Samuelson da Silva Lima (2025014860) - Garantia de qualidade e usabilidade.
+- Sheila Matias Barroso (2025014897) - Modelagem da estrutura e Herança.
+- Rubens Lopes dos Santos (2025014805) - Armazenamento de dados e settings.
+- Carlos Rodrigo Ferreira da Silva (2025014304) - Gestão de Produto e Cliente.
+- Viviana Barros Gomes de Sousa (2025014912) - Lógica central do carrinho, pedido e estoque.
+- Vitoria Cavalcante Souza (2025019481) - Cálculos, Pagamento, Frete e Transições.
+- Samuelson da Silva Lima (2025014860) - Garantia de qualidade e usabilidade.
 
 ## Principais Class do Projeto:
 
