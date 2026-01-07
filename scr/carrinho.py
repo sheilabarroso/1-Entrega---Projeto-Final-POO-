@@ -48,7 +48,6 @@ class Carrinho:
 
         for item in self.itens.values():
 
-            # Formatted the print statement for better readability
             print (
                 f"{item.produto.nome} ({item.quantidade}x) R$ {item.produto.preco_unitario:.2f} = R$ {item.subtotal():.2f}"
             )
