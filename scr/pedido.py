@@ -1,4 +1,6 @@
 from item_pedido import ItemPedido
+from pagamento import Pagamento
+from frete import Frete
 
 class Pedido:
     STATUS_CRIADO = "CRIADO"
