@@ -102,9 +102,9 @@ from enum import Enum
 from datetime import datetime
 from typing import List, Dict, Optional
 from pathlib import Path
-
-# --- PERSISTÊNCIA (dados.py integrado) ---
-
+```
+## PERSISTÊNCIA (dados.py integrado)
+```bash
 class LojaEncoder(json.JSONEncoder):
     """Garante que Datas e Enums sejam salvos corretamente no JSON."""
     def default(self, obj):
@@ -126,9 +126,9 @@ class GerenciadorDados:
     def salvar_dados(self, dados: dict):
         with open(self.caminho, "w", encoding="utf-8") as f:
             json.dump(dados, f, indent=4, cls=LojaEncoder, ensure_ascii=False)
-
-# --- MODELAGEM (POO) ---
-
+```
+## MODELAGEM (POO) 
+```bash
 class StatusPedido(Enum):
     CRIADO = "CRIADO"
     PAGO = "PAGO"
@@ -219,9 +219,9 @@ class Pedido:
         n += f"Total Devido: R$ {self.total_devido:.2f}\n"
         n += f"Status: {self.status.value}\n"
         return n
-
-# --- EXECUÇÃO ---
-
+```
+## EXECUÇÃO
+```bash
 if __name__ == "__main__":
     db = GerenciadorDados()
     
