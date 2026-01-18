@@ -94,4 +94,153 @@ loja-virtual/
 ## 🔗 Diagrama:
 <img width="913" height="685" alt="image" src="https://github.com/user-attachments/assets/6d79940b-796f-496d-b479-43a1007dcad9" />
 
+## 🔗 Código integral:
+```bash
+import json
+import uuid
+from enum import Enum
+from datetime import datetime
+from typing import List, Dict, Optional
+from pathlib import Path
+
+# --- PERSISTÊNCIA (dados.py integrado) ---
+
+class LojaEncoder(json.JSONEncoder):
+    """Garante que Datas e Enums sejam salvos corretamente no JSON."""
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, Enum):
+            return obj.value
+        if hasattr(obj, "__dict__"):
+            return obj.__dict__
+        return super().default(obj)
+
+class GerenciadorDados:
+    def __init__(self, arquivo_db="src/data/database.json"):
+        self.caminho = Path(arquivo_db)
+        self.caminho.parent.mkdir(parents=True, exist_ok=True)
+        if not self.caminho.exists():
+            self.salvar_dados({"produtos": [], "pedidos": []})
+
+    def salvar_dados(self, dados: dict):
+        with open(self.caminho, "w", encoding="utf-8") as f:
+            json.dump(dados, f, indent=4, cls=LojaEncoder, ensure_ascii=False)
+
+# --- MODELAGEM (POO) ---
+
+class StatusPedido(Enum):
+    CRIADO = "CRIADO"
+    PAGO = "PAGO"
+    CANCELADO = "CANCELADO"
+
+class Endereco:
+    def __init__(self, logradouro: str, cidade: str, uf: str, cep: str):
+        self.logradouro = logradouro
+        self.cidade = cidade
+        self.uf = uf.upper()
+        self.cep = cep
+
+    def __str__(self):
+        return f"{self.logradouro}, {self.cidade}-{self.uf}"
+
+class Produto:
+    def __init__(self, sku: str, nome: str, preco: float, estoque: int):
+        self.sku = sku
+        self.nome = nome
+        self.preco = preco
+        self.estoque = estoque
+        self.ativo = True
+
+    @property
+    def preco(self): return self._preco
+    @preco.setter
+    def preco(self, v):
+        if v <= 0: raise ValueError("Preço inválido")
+        self._preco = v
+
+    @property
+    def estoque(self): return self._estoque
+    @estoque.setter
+    def estoque(self, v):
+        if v < 0: raise ValueError("Estoque insuficiente")
+        self._estoque = v
+
+class Cupom:
+    def __init__(self, codigo: str, tipo: str, valor: float, validade: str):
+        self.codigo = codigo
+        self.tipo = tipo.upper() # 'PERCENTUAL' ou 'VALOR'
+        self.valor = valor
+        self.validade = datetime.strptime(validade, "%Y-%m-%d")
+
+    def esta_valido(self) -> bool:
+        return datetime.now() <= self.validade
+
+class ItemCarrinho:
+    def __init__(self, produto: Produto, quantidade: int):
+        self.produto = produto
+        self.quantidade = quantidade
+        self.subtotal = produto.preco * quantidade
+
+class Pedido:
+    def __init__(self, cliente_nome: str, endereco: Endereco, itens: List[ItemCarrinho], frete: float, cupom: Cupom = None):
+        self.id = str(uuid.uuid4())[:8]
+        self.cliente = cliente_nome
+        self.endereco = endereco
+        self.itens = itens
+        self.status = StatusPedido.CRIADO
+        self.valor_frete = frete
+        self.cupom = cupom
+
+    def calcular_desconto(self) -> float:
+        if not self.cupom or not self.cupom.esta_valido():
+            return 0.0
+        subtotal = sum(i.subtotal for i in self.itens)
+        if self.cupom.tipo == "PERCENTUAL":
+            return subtotal * (self.cupom.valor / 100)
+        return min(self.cupom.valor, subtotal)
+
+    @property
+    def total_devido(self):
+        subtotal = sum(i.subtotal for i in self.itens)
+        return max(subtotal + self.valor_frete - self.calcular_desconto(), 0.0)
+
+    def pagar(self):
+        if self.status != StatusPedido.CRIADO:
+            raise ValueError("Pedido não pode ser pago.")
+        for item in self.itens:
+            item.produto.estoque -= item.quantidade
+        self.status = StatusPedido.PAGO
+
+    def gerar_nota(self):
+        n = f"\n--- NOTA FISCAL #{self.id} ---\n"
+        for i in self.itens:
+            n += f"{i.produto.nome:.<20} x{i.quantidade}: R$ {i.subtotal:>8.2f}\n"
+        n += f"Total Devido: R$ {self.total_devido:.2f}\n"
+        n += f"Status: {self.status.value}\n"
+        return n
+
+# --- EXECUÇÃO ---
+
+if __name__ == "__main__":
+    db = GerenciadorDados()
+    
+    # Simulação
+    p1 = Produto("SKU01", "Smartphone S25", 2500.0, 10)
+    end = Endereco("Av. Beira Mar", "Fortaleza", "CE", "60000-000")
+    cupom = Cupom("PROMO26", "VALOR", 50.0, "2026-12-31")
+    
+    item = ItemCarrinho(p1, 1)
+    pedido = Pedido("Jayr Alencar", end, [item], 20.0, cupom)
+    
+    try:
+        pedido.pagar()
+        print(pedido.gerar_nota())
+        
+        # Salvando no JSON (Cumpre a exigência de persistência)
+        db.salvar_dados({"pedidos": [pedido.__dict__]})
+        print("Dados salvos com sucesso em database.json")
+        
+    except ValueError as e:
+        print(f"Erro: {e}")
 
