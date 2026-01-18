@@ -249,4 +249,6 @@ loja-virtual-cli/                 # Projeto principal da loja virtual em linha d
 ├── requirements.txt              # Dependências do projeto
 └── .gitignore                    # Arquivos e pastas ignorados pelo Git
 ```
+## 🔗 Diagrama:
+<img width="826" height="841" alt="image" src="https://github.com/user-attachments/assets/79eb4f9b-319e-4e74-86b3-5867b9669942" />
 
