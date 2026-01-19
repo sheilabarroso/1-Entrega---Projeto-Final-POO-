@@ -1,61 +1,42 @@
+from data.dados import carregar_dados, salvar_dados
 from produto import Produto
 from cliente import Cliente
 from carrinho import Carrinho
-from item_carrinho import ItemCarrinho
 from pedido import Pedido
-from pagamento import Pagamento
+from cupom import Cupom
 from frete import Frete
+from status_pedido import StatusPedido
 
 
 def main():
     print("=== LOJA VIRTUAL ===\n")
 
-    
     cliente = Cliente(
-        id_cliente=1,
-        nome="Vitória Cavalcante",
-        email="vitoria@email.com",
-        cpf="123.456.789-00"
+        1,
+        "Vitória Cavalcante",
+        "vitoria@email.com",
+        "12345678900",
+        []
     )
 
-    
-    produto1 = Produto("001", "Mouse Gamer", 120.00, 10)
-    produto2 = Produto("002", "Teclado Mecânico", 250.00, 5)
+    produto1 = Produto("001", "Mouse Gamer", "Periférico", 120.00, 10)
+    produto2 = Produto("002", "Teclado Mecânico", "Periférico", 250.00, 5)
 
+    carrinho = Carrinho(1, cliente)
+    carrinho.adicionar(produto1, 2)
+    carrinho.adicionar(produto2, 1)
 
-    carrinho = Carrinho(cliente)
-    carrinho.adicionar_produto(produto1, 2)
-    carrinho.adicionar_produto(produto2, 1)
+    print(f"Total do carrinho: R$ {carrinho.total():.2f}\n")
 
-    print("Carrinho criado com sucesso!")
-    print(f"Total do carrinho: R$ {carrinho.calcular_total():.2f}\n")
-
-    
     frete = Frete("CE")
-    valor_frete, prazo = frete.calcular_frete()
+    valor_frete, prazo = frete.calcular()
+    print(f"Frete: R$ {valor_frete:.2f} | Prazo: {prazo} dias\n")
 
-    print(f"Frete calculado: R$ {valor_frete:.2f}")
-    print(f"Prazo de entrega: {prazo} dias úteis\n")
+    pedido = Pedido(1, cliente, carrinho)
+    pedido.frete = valor_frete
+    pedido.status = StatusPedido.PAGO
 
-    
-    pedido = Pedido(
-        cliente=cliente,
-        itens=carrinho.itens,
-        valor_frete=valor_frete
-    )
-
-    print(f"Pedido criado com sucesso! ID: {pedido.id}")
-    print(f"Total do pedido: R$ {pedido.total_pedido():.2f}\n")
-
-    
-    pagamento = Pagamento(
-        forma_pagamento="PIX",
-        valor=pedido.total_pedido()
-    )
-
-    pagamento.confirmar_pagamento()
-    pedido.confirmar_pagamento()
-
+    print(pedido)
     print("\n=== COMPRA FINALIZADA COM SUCESSO ===")
 
 
