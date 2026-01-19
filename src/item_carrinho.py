@@ -1,3 +1,5 @@
+from produto import Produto
+
 class ItemCarrinho:
     def __init__(self, produto: Produto, quantidade: int):
         if quantidade <= 0:
